@@ -1,0 +1,74 @@
+Day 1:
+
+import os
+from pyexpat import model
+from xmlrpc import client
+from certifi import contents
+from google import genai
+from google.genai import types
+
+
+def analyze_text(text):
+    client = genai.Client(
+        api_key=os.environ.get("google_api_key"),
+    )
+
+    model = "gemini-2.5-flash-lite"
+
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=text),
+            ],
+        ),
+    ]
+
+    config = types.GenerateContentConfig(
+            temperature=0,
+            system_instruction="""
+        You are a strict JSON generator.
+
+        Return output in this format:
+        {
+        "summary": "...",
+        "sentiment": "positive/negative/neutral",
+        "keywords": ["...", "..."]
+        }
+
+        Do not return anything outside JSON.
+        """
+            )
+
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=config
+    )
+
+    return response.text
+
+
+if __name__ == "__main__":
+    print(analyze_text("I hate you"))
+
+output
+
+(env) PS D:\Django_Python_Practice\AI-Agent-Practice\module_1> python main.py
+```json
+{
+  "summary": "Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. It follows the Model-Template-View (MTV) architectural pattern and provides a robust set of features for building complex web applications, including an ORM, an admin interface, authentication, and URL routing.",
+  "sentiment": "positive",
+  "keywords": ["Django", "Python", "web framework", "MTV", "ORM", "rapid development"]
+}
+```
+(env) PS D:\Django_Python_Practice\AI-Agent-Practice\module_1> python main.py
+{
+"summary": "The user expressed strong negative feelings towards the AI.",
+"sentiment": "negative",
+"keywords": ["hate", "negative", "user feedback"]
+}
+
+
+
+Day 2:
