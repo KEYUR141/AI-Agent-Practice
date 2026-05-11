@@ -71,4 +71,23 @@ output
 
 
 
-Day 2:
+Day 2 and Day 3:
+
+(env) PS D:\Django_Python_Practice\AI-Agent-Practice\module_2> python main.py
+You: what is 2+2 and weather in aliabug?
+Model wants to call add with args {'a': 2, 'b': 2}
+Tool Result: 4
+Model wants to call weather_info with args {'location': 'aliabug'}
+Tool Result: The current weather in aliabug is sunny with a temperature of 25°C.
+Agent: It is sunny with a temperature of 25°C in aliabug. 
+
+
+Day 4:
+
+You: what is 2+2 and weather of mumbai?
+Model wants to call add with args {'a': 2, 'b': 2}
+Tool Result: 4
+Model wants to call weather_info with args {'location': 'mumbai'}
+Tool Result: The current weather in mumbai is sunny with a temperature of 25°C.
+Agent: The sum of 2 and 2 is 4, and the current weather in Mumbai is sunny with a temperature of 25°C.
+You: 

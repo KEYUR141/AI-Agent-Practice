@@ -19,7 +19,10 @@ def execute_tool(func_name, args):
 
 def run_agent(user_input):
     
-    messages = [user_input]
+    messages = [types.Content(
+        role="user",
+        parts=[types.Part(text=user_input)]
+    )]
 
     while True:
 
@@ -31,6 +34,7 @@ def run_agent(user_input):
     
 
         tools_called = False
+        final_text = ""
 
         for candidate in response.candidates:
             for part in candidate.content.parts:
@@ -63,11 +67,9 @@ def run_agent(user_input):
                     )
 
                 elif part.text:
-                    final_text = part.text
-            if not tools_called:
-                return final_text
-
-
+                    final_text += part.text
+        if not tools_called:
+            return final_text
 
 
 
