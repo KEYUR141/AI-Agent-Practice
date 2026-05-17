@@ -2,19 +2,23 @@ from google import genai
 from google.genai import types
 from config import API_KEY, MODEL
 from .agents_registry import tools
-from tools.math_tools import add 
-from tools.weather import weather_info
+from tools.registry import tools_map
 
 client = genai.Client(api_key=API_KEY)
 
 
 def execute_tool(func_name, args):
-    if func_name == "add":
-        return add(**args)
-    elif func_name == "weather_info":
-        return weather_info(**args)
-    
-    return "NO Tool Found"
+    try:
+        if not func_name in tools_map:
+                return f"Error: Tool {func_name} not found."
+        
+        func = tools_map.get(func_name)
+        if not func:
+            return f"Error: Function {func_name} not implemented."  
+        return func(**args)
+    except Exception as e:
+        return f"Error: Failed to execute tool {func_name}. {str(e)}"       
+
 
 
 def run_agent(user_input):
