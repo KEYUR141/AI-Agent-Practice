@@ -1,3 +1,17 @@
+from tools.registry import register_tool
+
+@register_tool(
+        name="add",
+        description = "Add Two Numbers and return the result",
+        parameters = {
+            "type": "object",
+            "properties": {
+                "a": {"type": "integer"},
+                "b": {"type": "integer"},
+            },
+            "required": ["a", "b"], 
+        }
+)
 def add( a: int, b: int) -> int:
     try:
         if not isinstance(a, int):

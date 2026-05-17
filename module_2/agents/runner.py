@@ -1,23 +1,24 @@
 from google import genai
 from google.genai import types
 from config import API_KEY, MODEL
-from .agents_registry import tools
-from tools.registry import tools_map
-
+from google.genai import types
+from agents.tools_registry import tools
+from tools.registry import TOOL_MAP as tools_map
+import json
 client = genai.Client(api_key=API_KEY)
 
 
 def execute_tool(func_name, args):
     try:
         if not func_name in tools_map:
-                return f"Error: Tool {func_name} not found."
+                return {"error": f"Error: Tool {func_name} not found."}
         
         func = tools_map.get(func_name)
         if not func:
-            return f"Error: Function {func_name} not implemented."  
+            return {"error": f"Error: Function {func_name} not implemented."}
         return func(**args)
     except Exception as e:
-        return f"Error: Failed to execute tool {func_name}. {str(e)}"       
+        return {"error": f"Error: Failed to execute tool {func_name}. {str(e)}"}
 
 
 
