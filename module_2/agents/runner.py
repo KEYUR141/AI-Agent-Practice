@@ -1,6 +1,6 @@
 from google import genai
 from google.genai import types
-from config import API_KEY, MODEL
+from config import API_KEY, MODEL, AGENT_SYSTEM_PROMPT
 from google.genai import types
 from agents.tools_registry import tools
 from tools.registry import TOOL_MAP as tools_map
@@ -21,20 +21,58 @@ def execute_tool(func_name, args):
         return {"error": f"Error: Failed to execute tool {func_name}. {str(e)}"}
 
 
+def create_plan(user_input):
+
+    response = client.models.generate_content(
+            model = MODEL,
+            contents = f"""
+            Create a Execution Plan.
+
+            Task:
+            {user_input}
+
+            return:
+            - Step 1
+            - Step 2
+
+            """,
+    )
+
+    return response.text
+
+
+
 
 def run_agent(user_input):
     
-    messages = [types.Content(
-        role="user",
-        parts=[types.Part(text=user_input)]
-    )]
+    # if not user_input.strip():
+    #     continue
+
+    plan = create_plan(user_input)
+
+    print("=====Plan=====")
+    print(plan)
+
+    trace = []
+
+    messages = [
+        types.Content(
+            role = "User",
+            parts = [types.Part(text = user_input)]
+        )
+    ]
+
+
 
     while True:
 
         response = client.models.generate_content(
             model = MODEL,
             contents = messages,
-            config = {"tools": tools},
+            config = types.GenerateContentConfig(
+                tools = tools,
+                system_instruction= AGENT_SYSTEM_PROMPT
+            ),
         )
     
 
@@ -55,6 +93,13 @@ def run_agent(user_input):
 
                     print(f"Tool Result: {result}")
 
+                    trace.append(
+                        {
+                            "tool": func_name,
+                            "args": args,
+                            "result": result
+                        }
+                    )
                     # Add model's function call to messages
                     messages.append(
                         types.Content(
@@ -67,7 +112,18 @@ def run_agent(user_input):
                     messages.append(
                         types.Content(
                             role="user",
-                            parts=[types.Part(text=str(result))]
+                            parts=[
+                                types.Part(
+                                    text=f"""
+                                Tool Execution Result
+
+                                Tool: {func_name}
+
+                                Output:
+                                {result}
+                                """
+                                )
+                            ]
                         )
                     )
 
@@ -79,50 +135,3 @@ def run_agent(user_input):
 
 
 
-# def run_agent(user_input):
-    
-#     response = client.models.generate_content(
-#         model=MODEL,
-#         contents=user_input,
-#         config={"tools": tools}
-#     )
-
-#     print(response)
-#     for candidate in response.candidates:
-#         for part in candidate.content.parts:
-
-#             # If model wants to call a function
-#             if part.function_call:
-#                 func_name = part.function_call.name
-#                 args = part.function_call.args
-
-#                 if func_name == "add":
-#                     result = add(**args)
-
-#                 elif func_name == "weather_info":
-#                     result = weather_info(**args)
-
-#                 # Send result back to model with proper Content format
-#                 final_response = client.models.generate_content(
-#                     model=MODEL,
-#                     contents=[
-#                         types.Content(
-#                             role="user",
-#                             parts=[types.Part(text=user_input)]
-#                         ),
-#                         types.Content(
-#                             role="model",
-#                             parts=[part]
-#                         ),
-#                         types.Content(
-#                             role="user",
-#                             parts=[types.Part(text=str(result))]
-#                         )
-#                     ]
-#                 )
-
-#                 return final_response.text
-
-#             # If no tool call, just return text
-#             if part.text:
-#                 return part.text

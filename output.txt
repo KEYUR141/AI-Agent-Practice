@@ -91,3 +91,101 @@ Model wants to call weather_info with args {'location': 'mumbai'}
 Tool Result: The current weather in mumbai is sunny with a temperature of 25°C.
 Agent: The sum of 2 and 2 is 4, and the current weather in Mumbai is sunny with a temperature of 25°C.
 You: 
+
+
+Day 7:
+
+
+Day 7 is where we stop thinking about tools and start thinking about decision-making.
+
+Up until now your agent is:
+
+User
+ ↓
+LLM
+ ↓
+Tool Call
+ ↓
+Result
+ ↓
+Response
+
+This is reactive.
+
+The model sees something and immediately acts.
+
+But real agent systems often do:
+
+User
+ ↓
+Analyze Task
+ ↓
+Create Plan
+ ↓
+Execute Step 1
+ ↓
+Observe
+ ↓
+Execute Step 2
+ ↓
+Observe
+ ↓
+Final Answer
+
+This is the difference between a chatbot with tools and an actual agent.
+
+Problem With Current Agent
+
+Let's say the user asks:
+
+Find weather in Mumbai and calculate how many days are left until New Year.
+
+Your current agent might:
+
+call one tool
+call another tool
+answer
+
+But it has no explicit plan.
+
+It is making decisions internally and you can't see them.
+
+That becomes difficult when:
+
+debugging
+improving behavior
+understanding failures
+Goal of Day 7
+
+We want the agent to produce:
+
+PLAN:
+1. Get current weather
+2. Calculate days until New Year
+
+ACTION:
+Call get_weather
+
+OBSERVATION:
+Weather is sunny
+
+ACTION:
+Call days_until_new_year
+
+OBSERVATION:
+178 days
+
+FINAL ANSWER:
+...
+
+This is called an agent trace.
+
+=====Plan=====
+Here's an execution plan for the task "what is 2+2?":
+
+- **Step 1:** Identify the operation required, which is addition.
+- **Step 2:** Perform the addition of the two numbers, 2 and 2, to arrive at the sum.
+Model wants to call add with args {'b': 2, 'a': 2}
+Tool Result: 4
+Agent: 2 + 2 is 4.
+You: 
